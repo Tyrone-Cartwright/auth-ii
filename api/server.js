@@ -4,10 +4,10 @@ const helmet = require("helmet");
 const knex = require("knex");
 const bcrypt = require("bcryptjs"); // added
 const jwt = require("jsonwebtoken");
-const protectedMW = require("../middleware/protectedHelper.js");
-const checkRoleMW = require("../middleware/protectedHelper.js");
-const protected = protectedMW.protected;
-const roleMW = protectedMW.checkRole;
+const helpers = require("../middleware/protectedHelper.js");
+
+const protected = helpers.protected;
+const roleMW = helpers.checkRole;
 
 const knexConfig = require("../knexfile.js");
 
@@ -26,7 +26,7 @@ function generateToken(user) {
   const payload = {
     username: user.username,
     name: user.name,
-    roles: ["admin", "sales"]
+    department: user.department
   };
   const secret = process.env.JWT_SECRET;
   const options = {
@@ -77,7 +77,7 @@ server.get("/users", protected, async (req, res) => {
   res.status(200).json({ users, token: req.decodedToken });
 });
 
-server.get("/users/:id", protected, async (req, res) => {
+server.get("/users/:id", protected, roleMW("admin"), async (req, res) => {
   const user = await db("users")
     .where({ id: req.params.id })
     .first();
