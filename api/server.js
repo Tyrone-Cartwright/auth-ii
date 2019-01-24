@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const helmet = require("helmet");
+const cors = require("cors");
 const knex = require("knex");
 const bcrypt = require("bcryptjs"); // added
 const jwt = require("jsonwebtoken");
@@ -16,7 +17,7 @@ const server = express();
 const db = knex(knexConfig.development);
 
 server.use(helmet());
-server.use(cors());
+server.use(cors({ credentials: true, origin: "http://localhost:3000" }));
 server.use(express.json());
 
 server.get("/", (req, res) => {
@@ -72,7 +73,8 @@ server.get("/users", protected, async (req, res) => {
     "id",
     "username",
     "name",
-    "department"
+    "department",
+    "password"
   );
 
   res.status(200).json({ users, token: req.decodedToken });
