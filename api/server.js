@@ -16,6 +16,7 @@ const server = express();
 const db = knex(knexConfig.development);
 
 server.use(helmet());
+server.use(cors());
 server.use(express.json());
 
 server.get("/", (req, res) => {
